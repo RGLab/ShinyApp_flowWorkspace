@@ -129,7 +129,8 @@ shinyServer(function(input, output) {
         f1 <- paste("`",y_axis,"`~`",x_axis,"`",sep="")
         
         cond <- input$cond
-        if(cond!="name"){
+#         browser()
+        if(length(cond)>0&&cond!="name"&&nchar(cond)>0){
           f1 <- paste(f1,cond,sep="|")
         }
         #       browser()
@@ -170,12 +171,19 @@ shinyServer(function(input, output) {
       #check if there are multiple flowFrames per panel
       #cat FCS file name to cond if so
       cur_factors <- lapply(group_v,function(cur_group_v){factor(cur_data[,cur_group_v])})
-      multi_frames <- unlist(by(cur_data,cur_factors,function(cur_df){
-        nrow(cur_df) != 1
-      }))
-      if(any(multi_frames)){
-        cond <- gsub("\\+",":",cond)
-        cond <- paste(cond,"name",sep=":")
+      if(length(cur_factors) > 0){
+        multi_frames <- unlist(by(cur_data,cur_factors,function(cur_df){
+          nrow(cur_df) != 1
+        }))
+        if(any(multi_frames)){
+          cond <- gsub("\\+",":",cond)
+          cond <- paste(cond,"name",sep=":")
+        }  
+      }
+      
+#       browser()
+      if(length(cond)==0||cond=="name"||nchar(cond)==0){
+        cond <- NULL
       }
       print(plotGate(x = gs_input()
                      , y = pop_ind
