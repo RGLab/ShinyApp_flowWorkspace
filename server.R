@@ -33,7 +33,10 @@ shinyServer(function(input, output) {
   # pdata output
   output$summary <- renderGvis({
 #     browser()
-       gvisTable(cur_pd(),list(page="disable"),chartid="name")  
+      to_display <- cur_pd()
+#       to_display <- cbind(to_display,pop_stats())
+#       to_display$TESTDT <- NULL
+       gvisTable(to_display,list(page="disable"),chartid="name")  
   })
   #gate plot
   output$Gates <- renderPlot({
@@ -68,6 +71,7 @@ shinyServer(function(input, output) {
                          , cond = cond
                          , margin = input$margin 
     #                                              , layout = layout
+                        , bool = TRUE
                         )
                 )
       

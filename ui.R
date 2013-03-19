@@ -15,11 +15,11 @@ shinyUI(pageWithSidebar(
   headerPanel("flowWorkspace & flowViz"),
   
   sidebarPanel(
-# #     submitButton("update")
+#     submitButton("update")
     h4("Filters:")
     ,selectInput("PTID", "Subjects:", 
                 choices = PTID
-                ,selected = PTID
+                ,selected = PTID[1]
                 ,multiple = TRUE
     )
     ,selectInput("VISITNO", "Visits:", 
@@ -35,13 +35,13 @@ shinyUI(pageWithSidebar(
 
     , selectInput("pops", "Populations:", 
                   choices = pop_ind[-1]
-                  ,selected = pop_ind[6]
+                  ,selected = names(pop_ind[74])
                   ,multiple = FALSE)
     
     ,h4("Grouping:")
     ,selectInput("group", "Group by:", 
                  choices = colnames(pd)
-                 ,selected = "name"
+                 ,selected = "VISITNO"
                  ,multiple = TRUE
     )
     ,checkboxInput("oneLevel", "Convert to one level:"
@@ -52,7 +52,7 @@ shinyUI(pageWithSidebar(
     ,checkboxInput("boxplot","boxplot",value=TRUE)
     , selectInput("x_axis", "X-axis", 
                   choices = colnames(pd)
-                  ,selected = "name"
+                  ,selected = "Stim"
                   ,multiple = FALSE) 
     
   
