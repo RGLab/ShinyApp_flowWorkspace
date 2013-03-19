@@ -145,7 +145,8 @@ shinyServer(function(input, output) {
           print(xyplot(as.formula(f1)
                  ,data=df
                  ,scales=list(x=list(rot=45))
-                 ,ylab="pop %"))
+                 ,ylab="pop %"
+                 ,jitter.x=TRUE))
           
         }
       
