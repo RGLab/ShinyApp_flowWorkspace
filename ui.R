@@ -37,7 +37,7 @@ shinyUI(pageWithSidebar(
                , htmlOutput("summary")
                )
       ,tabPanel("Stats"
-                ,checkboxInput("boxplot","boxplot",value=TRUE)
+                ,checkboxInput("boxplot","boxplot",value=FALSE)
                 ,uiOutput("axisCntrol")
                , plotOutput("stats_plot")
                )
