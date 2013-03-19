@@ -1,6 +1,6 @@
 library(shiny)
 library(flowWorkspace)
-path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace/gs")
+path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 unarchive_new<-function(path){
   
   if(!file.exists(path))
@@ -45,9 +45,10 @@ unarchive_new<-function(path){
   return (gs)
   
 }
-gs <- unarchive_new(path)
+gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
+gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
 #preprocess pdata
-pd <- pData(gs)
+# pd <- pData(gs)
 # #make Stim column for negctrl unqiue
 # pd <- by(pd,list(pd$PTID,pd$VISITNO),function(cur_group){
 # #   browser()

@@ -2,48 +2,30 @@
 ##100 subjects 20 placebo (need to get study variables csv)
 ##query by and condition on study variables and plot sepcific populations
 
-PTID <- unique(as.character(pd$PTID))
-Stim <- unique(as.character(pd$Stim))
-VISITNO <- unique(as.character(pd$VISITNO))
-populations <- getNodes(gs[[1]],isPath=TRUE)
-pop_ind <- 1:length(populations)
-names(pop_ind) <- populations
+
+
+
 
 shinyUI(pageWithSidebar(
     
   # Application title
-  headerPanel("flowWorkspace & flowViz")
-  
+  uiOutput("titleCntrol")  
   ,sidebarPanel(
 #     uiOutput("submitCntrol")  
     h4("Filters:")
-    ,selectInput("PTID", "Subjects:", 
-                choices = PTID
-                ,selected = PTID[1]
-                ,multiple = TRUE
+    ,selectInput("study", "Studies:", 
+                  choices = c("HVTN-080-small","HVTN-080-big")
+                  ,selected = "HVTN-080-small"
     )
-    ,selectInput("VISITNO", "Visits:", 
-                choices = VISITNO
-                ,selected = VISITNO
-                ,multiple = TRUE
-    )
-    ,selectInput("Stim", "Stimulation:", 
-                choices = Stim
-                ,selected = Stim
-                ,multiple = TRUE
-    )
-
-    , selectInput("pops", "Populations:", 
-                  choices = pop_ind[-1]
-                  ,selected = names(pop_ind[74])
-                  ,multiple = FALSE)
+    ,uiOutput("PTIDCntrol")  
+    ,uiOutput("visitCntrol")
+    ,uiOutput("stimCntrol")  
+    ,uiOutput("popCntrol")  
+  
     
     ,h4("Grouping:")
-    ,selectInput("group", "Group by:", 
-                 choices = colnames(pd)
-                 ,selected = "VISITNO"
-                 ,multiple = TRUE
-    )
+    ,uiOutput("groupCntrol")  
+   
     ,checkboxInput("oneLevel", "Convert to one level:"
                   ,value = FALSE)
    , uiOutput("condCntrol")

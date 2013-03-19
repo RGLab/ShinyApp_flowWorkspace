@@ -1,6 +1,75 @@
 library(googleVis)
 shinyServer(function(input, output) {
 #   browser()
+  study_selected <- reactive({
+    input$study  
+  })
+  
+  output$titleCntrol <- renderUI({
+    
+    headerPanel(study_selected(),"flowWorkspace & flowViz")
+  })
+  gs_selected <- reactive({
+    this_study <- study_selected()
+    if(this_study == "HVTN-080-small"){
+      gs_small
+    }else if(this_study == "HVTN-080-big"){
+      gs_big
+    }else{
+      stop("not valid study!")
+    }
+  })
+  pd_selected <- reactive({
+    pData(gs_selected())
+  })
+  
+  output$PTIDCntrol <- renderUI({
+#     browser()
+    PTID <- unique(as.character(pd_selected()$PTID))
+    selectInput("PTID", "Subjects:", 
+                choices = PTID
+                ,selected = PTID[1]
+                ,multiple = TRUE
+    )
+  })
+  
+  
+  output$visitCntrol <- renderUI({
+    VISITNO <- unique(as.character(pd_selected()$VISITNO))
+    selectInput("VISITNO", "Visits:", 
+                 choices = VISITNO
+                 ,selected = VISITNO
+                 ,multiple = TRUE
+    )
+  })
+  output$stimCntrol <- renderUI({
+    
+    Stim <- unique(as.character(pd_selected()$Stim))
+    
+    selectInput("Stim", "Stimulation:", 
+                 choices = Stim
+                 ,selected = Stim
+                 ,multiple = TRUE
+    )
+  })
+  
+  output$popCntrol <- renderUI({
+    populations <- getNodes(gs_selected()[[1]],isPath=TRUE)
+    pop_ind <- 1:length(populations)
+    names(pop_ind) <- populations
+    selectInput("pops", "Populations:", 
+                  choices = pop_ind[-1]
+                  ,selected = names(pop_ind[74])
+                  ,multiple = FALSE)
+  })
+  
+  output$groupCntrol <- renderUI({
+    selectInput("group", "Group by:", 
+                 choices = colnames(pd_selected())
+                 ,selected = "VISITNO"
+                 ,multiple = TRUE
+    )
+  })
   
 #     output$submitCntrol <- renderUI({
 #       if(input$plotType == "Stats"){
@@ -26,7 +95,7 @@ shinyServer(function(input, output) {
               , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
      )
      
-     gs[selected_samples]
+     gs_selected()[selected_samples]
 
   })
     
