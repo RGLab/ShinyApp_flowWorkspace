@@ -70,6 +70,13 @@ shinyServer(function(input, output) {
                  ,multiple = TRUE
     )
   })
+  output$axisCntrol <- renderUI({
+
+    selectInput("x_axis", "X-axis", 
+                choices = colnames(pd_selected())
+                ,selected = "Stim"
+                ,multiple = FALSE)
+  })
   
 #     output$submitCntrol <- renderUI({
 #       if(input$plotType == "Stats"){
@@ -90,11 +97,12 @@ shinyServer(function(input, output) {
   
   # Reactive expression
    gs_input <- reactive({
+#      browser()
      selected_samples <- as.character(
-       subset(pd
+       subset(pd_selected()
               , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
      )
-     
+     if(length(selected_samples) == 0)selected_samples = 1
      gs_selected()[selected_samples]
 
   })
@@ -106,6 +114,7 @@ shinyServer(function(input, output) {
   })
     
   cur_pd <- reactive({
+#     browser()
     pData(gs_input())
   })
     

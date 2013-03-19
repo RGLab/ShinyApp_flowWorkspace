@@ -37,10 +37,7 @@ shinyUI(pageWithSidebar(
     , conditionalPanel(
               condition = "input.plotType == 'Stats'"
               ,checkboxInput("boxplot","boxplot",value=TRUE)
-              , selectInput("x_axis", "X-axis", 
-                            choices = colnames(pd)
-                            ,selected = "Stim"
-                            ,multiple = FALSE)
+              ,uiOutput("axisCntrol")
       )
 
   
