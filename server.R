@@ -85,12 +85,16 @@ shinyServer(function(input, output) {
       y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
       x_axis <- input$x_axis
       f1 <- paste("`",y_axis,"`~`",x_axis,"`",sep="")
+      
       cond <- input$cond
       if(cond!="name"){
         f1 <- paste(f1,cond,sep="|")
       }
+#       browser()
+      f1 <- gsub("\\\\","\\\\\\\\",f1)
+      f1 <- as.formula(f1)
       if(input$boxplot){
-        print(bwplot(as.formula(f1)
+        print(bwplot(f1
                      ,data=df
                      ,scales=list(x=list(rot=45))
                      ,ylab="pop %")
