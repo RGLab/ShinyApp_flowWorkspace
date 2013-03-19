@@ -46,7 +46,7 @@ unarchive_new<-function(path){
   
 }
 gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
-gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
+# gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
 #preprocess pdata
 # pd <- pData(gs)
 # #make Stim column for negctrl unqiue
