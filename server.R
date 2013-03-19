@@ -1,6 +1,16 @@
 library(googleVis)
 shinyServer(function(input, output) {
 #   browser()
+  
+#     output$submitCntrol <- renderUI({
+#       if(input$plotType == "Stats"){
+#         helpText("")  
+#       }else{
+#         submitButton("update gate")
+#       }
+#       
+#       
+#     })
     output$condCntrol <- renderUI({
       group_v <-  input$group
       cond_type <- ifelse(input$oneLevel,":","+")
@@ -39,7 +49,7 @@ shinyServer(function(input, output) {
        gvisTable(to_display,list(page="disable"),chartid="name")  
   })
   #gate plot
-  output$Gates <- renderPlot({
+  gate_plot <- reactive({
         xbin <- input$xbin
         cur_data <-cur_pd()
         group_v <-  input$group
@@ -62,7 +72,7 @@ shinyServer(function(input, output) {
           cond <- gsub("\\+",":",cond)
           cond <- paste(cond,"name",sep=":")
         }
-       print(plotGate(x = gs_input()
+       plotGate(x = gs_input()
                          , y = pop_ind
                          , xbin = xbin
                          , stats = stats
@@ -73,14 +83,11 @@ shinyServer(function(input, output) {
     #                                              , layout = layout
                         , bool = TRUE
                         )
-                )
-      
       
                                 
     })
-    # pop stats plot
-    output$plot <- renderPlot({
-
+    
+    stat_plot <- reactive({
       df <- cbind(cur_pd()[rownames(pop_stats()),],pop_stats())
       y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
       x_axis <- input$x_axis
@@ -90,22 +97,36 @@ shinyServer(function(input, output) {
       if(cond!="name"){
         f1 <- paste(f1,cond,sep="|")
       }
-#       browser()
+      #       browser()
       f1 <- gsub("\\\\","\\\\\\\\",f1)
       f1 <- as.formula(f1)
       if(input$boxplot){
-        print(bwplot(f1
-                     ,data=df
-                     ,scales=list(x=list(rot=45))
-                     ,ylab="pop %")
-        )
+        bwplot(f1
+               ,data=df
+               ,scales=list(x=list(rot=45))
+               ,ylab="pop %")
+        
       }else{
-        print(xyplot(as.formula(f1)
-                     ,data=df
-                     ,scales=list(x=list(rot=45))
-                     ,ylab="pop %")
-        )  
+        xyplot(as.formula(f1)
+               ,data=df
+               ,scales=list(x=list(rot=45))
+               ,ylab="pop %")
+         
       }
+    })
+      
+    
+    
+    output$plot <- renderPlot({
+      plotType <- input$plotType
+#       browser ()
+      if (plotType == "Stats"){
+        print(stat_plot())
+      }else
+      {
+        print(gate_plot())
+      }
+      
       
     })
   

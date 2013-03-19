@@ -12,10 +12,10 @@ names(pop_ind) <- populations
 shinyUI(pageWithSidebar(
     
   # Application title
-  headerPanel("flowWorkspace & flowViz"),
+  headerPanel("flowWorkspace & flowViz")
   
-  sidebarPanel(
-#     submitButton("update")
+  ,sidebarPanel(
+#     uiOutput("submitCntrol")  
     h4("Filters:")
     ,selectInput("PTID", "Subjects:", 
                 choices = PTID
@@ -48,44 +48,52 @@ shinyUI(pageWithSidebar(
                   ,value = FALSE)
    , uiOutput("condCntrol")
     
-    ,h4("Stats plot Settings:")  
-    ,checkboxInput("boxplot","boxplot",value=TRUE)
-    , selectInput("x_axis", "X-axis", 
-                  choices = colnames(pd)
-                  ,selected = "Stim"
-                  ,multiple = FALSE) 
+    ,h4("plot Settings:")  
+    ,radioButtons("plotType",label = "Plot type",choices = c("Stats","Gate"),selected= "Stats")
     
+    #stats setting
+    , conditionalPanel(
+              condition = "input.plotType == 'Stats'"
+              ,checkboxInput("boxplot","boxplot",value=TRUE)
+              , selectInput("x_axis", "X-axis", 
+                            choices = colnames(pd)
+                            ,selected = "Stim"
+                            ,multiple = FALSE)
+      )
+
   
    
-    ,h4("Gate Plot Settings:")  
-    # stats args
-    , checkboxInput("stats", "show %", value = TRUE)
+    #gate setting
     , conditionalPanel(
-                      condition = "input.stats == true",
-                      sliderInput("digits" 
-                                  , "digits:" 
-                                  , value = 3
-                                  , step= 1
-                                  , min = 2
-                                  , max = 6
-                                 )
+          condition = "input.plotType == 'Gate'"
+        , checkboxInput("stats", "show %", value = TRUE)
+        , conditionalPanel(
+                          condition = "input.stats == true",
+                          sliderInput("digits" 
+                                      , "digits:" 
+                                      , value = 3
+                                      , step= 1
+                                      , min = 2
+                                      , max = 6
+                                     )
+                        )
+#           
+#           ##smooth args
+        , checkboxInput("smooth", "smooth", value = TRUE)
+        , conditionalPanel(
+          condition = "input.smooth == false",
+          sliderInput("xbin", 
+                      "significant digits:" 
+                      , value = 64
+                      , step= 64
+                      , min = 64
+                      , max = 256
+                      
                     )
-      
-      ##smooth args
-    , checkboxInput("smooth", "smooth", value = TRUE)
-    , conditionalPanel(
-      condition = "input.smooth == false",
-      sliderInput("xbin", 
-                  "significant digits:" 
-                  , value = 64
-                  , step= 64
-                  , min = 64
-                  , max = 256
-                  
-                )
+        )
+        , checkboxInput("margin", "margin", value = TRUE)
+         
     )
-    , checkboxInput("margin", "margin", value = TRUE)
-    
     
   ),
   
@@ -94,10 +102,7 @@ shinyUI(pageWithSidebar(
   mainPanel(
     tabsetPanel(
       tabPanel("summary", htmlOutput("summary")), 
-      tabPanel("stats plot", plotOutput("plot")), 
-#       tabPanel("Stats table", tableOutput("Statistics")),
-      tabPanel("Gates", plotOutput("Gates"))
-      
+      tabPanel("plot", plotOutput("plot"))
     )
   )
 ))
