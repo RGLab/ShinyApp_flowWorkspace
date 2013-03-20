@@ -1,14 +1,14 @@
 ##/loc/no-backup/remote_fred_hvtn/RV144/CD4\ Cytokine\
 ##100 subjects 20 placebo (need to get study variables csv)
 ##query by and condition on study variables and plot sepcific populations
-
+library(shinyIncubator)
 
 shinyUI(pageWithSidebar(
     
   # Application title
   uiOutput("titleCntrol")  
   ,sidebarPanel(
-#     uiOutput("submitCntrol")  
+    
 #     h4("Filters:")
     
     selectInput("study", "Studies:", 
@@ -25,6 +25,9 @@ shinyUI(pageWithSidebar(
     ,checkboxInput("oneLevel", "Convert to one level:"
                    ,value = FALSE)
     , uiOutput("condCntrol")
+#      , checkboxInput("custlayout", "Custom layout", value = FALSE)
+#      ,  numericInput("rows","rows:",value=0,min=0)
+#     ,uiOutput("columnsControl")
     
     
   ),
@@ -45,6 +48,7 @@ shinyUI(pageWithSidebar(
                , checkboxInput("stats", "show proportions", value = TRUE)
                , checkboxInput("smooth", "smooth", value = FALSE)
                , checkboxInput("margin", "margin", value = FALSE)
+              ,actionButton("actPlot","plot")  
                , plotOutput("gate_plot")
             )
     )

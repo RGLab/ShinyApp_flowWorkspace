@@ -48,7 +48,7 @@ unarchive_new<-function(path){
 gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
 # gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
 #preprocess pdata
-# pd <- pData(gs)
+# pd <- pData(gs_big)
 # #make Stim column for negctrl unqiue
 # pd <- by(pd,list(pd$PTID,pd$VISITNO),function(cur_group){
 # #   browser()
@@ -58,13 +58,13 @@ gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
 #   cur_group
 # })
 # pd <- do.call(rbind,pd)
-# 
-# #factorize study variables
+# # 
+# # #factorize study variables
 # pd$Stim <- factor(pd$Stim)
 # pd$PTID <- factor(pd$PTID)
 # pd$VISITNO <- factor(pd$VISITNO)
 # pd$SampleOrder <- factor(pd$SampleOrder)
 # pd$METHOD <- factor(pd$METHOD)
-
-
-# pData(gs) <- pd
+# 
+# 
+# pData(gs_small) <- pd

@@ -40,7 +40,7 @@ shinyServer(function(input, output) {
         VISITNO <- unique(as.character(pd_selected()$VISITNO))
         selectInput("VISITNO", "Visits:", 
                      choices = VISITNO
-                     ,selected = VISITNO
+                     ,selected = VISITNO[1]
                      ,multiple = TRUE
         )
       })
@@ -152,9 +152,24 @@ shinyServer(function(input, output) {
         }
       
     })
+#   nSamples <- reactive({
+#     nrow(cur_pd())
+#     })
+#   this_columns <- reactive({
+#      ceiling(nSamples()/input$rows)
+#   })
+#   
+#       
+#   output$columnsControl <- renderUI({
+# #     browser()
+#     textInput("columns",this_columns())
+#   })
   output$gate_plot <- renderPlot({
-    
 #       xbin <- input$xbin
+    if (input$actPlot == 0)
+      return()
+    
+   isolate({
       xbin <- 64
       cur_data <-cur_pd()
       group_v <-  input$group
@@ -166,7 +181,9 @@ shinyServer(function(input, output) {
 #       digits <- input$digits
       digits <- 2
       cond <- input$cond
-      #                                 layout <- c(input$col,input$row,1)
+     
+      
+      
 #                                       browser()
       #check if there are multiple flowFrames per panel
       #cat FCS file name to cond if so
@@ -185,18 +202,27 @@ shinyServer(function(input, output) {
       if(length(cond)==0||cond=="name"||nchar(cond)==0){
         cond <- NULL
       }
-      print(plotGate(x = gs_input()
-                     , y = pop_ind
-                     , xbin = xbin
-                     , stats = stats
-                     , smooth = smooth
-                     , digits = digits
-                     , cond = cond
-                     , margin = input$margin 
-                     #                                              , layout = layout
-                     , bool = TRUE
-      ))
       
+#       if(input$rows>0&&length(input$rows)>0){
+#         layout <- c(this_columns(),input$rows,1)  
+#       }else{
+        layout <- NULL
+#       }
+#         browser()
+      print(
+        plotGate(x = gs_input()
+                 , y = pop_ind
+                 , xbin = xbin
+                 , stats = stats
+                 , smooth = smooth
+                 , digits = digits
+                 , cond = cond
+                 , margin = input$margin 
+                 , bool = TRUE
+                 , layout = layout
+        )
+      )      
+   })  
     
   })
 })
