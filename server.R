@@ -129,27 +129,28 @@ shinyServer(function(input, output) {
           #reset rows when unchecked
             numericInput("rows","rows:",value=0,min=0)    
       })
-      this_columns <- reactive({
-        this_row <- input$rows
-        if(this_row == 0){
-          0
-        }else{
-          ceiling(nSamples()/input$rows) 
-        }
-        
-      })
+#       this_columns <- reactive({
+#         this_row <- input$rows
+#         if(this_row == 0){
+#           0
+#         }else{
+#           ceiling(nSamples()/input$rows) 
+#         }
+#         
+#       })
       
-      output$columnsControl <- renderUI({
-#             browser()
-            helpText(paste("columns",this_columns(),sep=":"))
-      })
+#       output$columnsControl <- renderUI({
+# #             browser()
+#             helpText(paste("columns",this_columns(),sep=":"))
+#       })
       layout <- reactive({
 #         browser()
         
         if(input$rows==0||length(input$rows)==0||!input$custlayout){
           NULL
         }else{
-          c(this_columns(),input$rows,1)  
+#           c(this_columns(),input$rows,1)  
+          c(NA,input$rows,1)  
         }
       })
       
