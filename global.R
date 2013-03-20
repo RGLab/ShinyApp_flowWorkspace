@@ -48,7 +48,7 @@ unarchive_new<-function(path){
 gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
 # gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
 #preprocess pdata
-# pd <- pData(gs_big)
+# pd <- pData(gs_small)
 # #make Stim column for negctrl unqiue
 # pd <- by(pd,list(pd$PTID,pd$VISITNO),function(cur_group){
 # #   browser()
@@ -68,3 +68,4 @@ gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
 # 
 # 
 # pData(gs_small) <- pd
+

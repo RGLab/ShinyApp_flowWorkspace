@@ -169,10 +169,16 @@ shinyServer(function(input, output) {
 #               browser()
         if(input$boxplot){
           print(bwplot(f1
-                 ,data=df
-                 ,scales=list(x=list(rot=45))
-                 ,ylab="pop %"
-                 ,layout=layout()))
+                     ,data=df
+                     ,scales=list(x=list(rot=45))
+                     ,ylab="pop %"
+                     ,layout=layout()
+                     ,panel=function(...){
+                       panel.bwplot(...)
+                       panel.xyplot(...,jitter.x=TRUE)
+                      }
+                   )
+                )
           
         }else{
           print(xyplot(as.formula(f1)
