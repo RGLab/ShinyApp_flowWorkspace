@@ -214,7 +214,7 @@ shinyServer(function(input, output) {
       pop_ind <- as.integer(input$pops)
       
       #     if(pops == "all")pops = NULL
-      smooth <- input$smooth
+#       smooth <- input$smooth
       stats <- input$stats
 #       digits <- input$digits
       digits <- 2
@@ -248,10 +248,10 @@ shinyServer(function(input, output) {
                  , y = pop_ind
                  , xbin = xbin
                  , stats = stats
-                 , smooth = smooth
+                 , smooth = FALSE
                  , digits = digits
                  , cond = cond
-                 , margin = input$margin 
+                 , margin = FALSE
                  , bool = TRUE
                  ,layout=layout()
         )

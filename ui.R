@@ -49,8 +49,8 @@ shinyUI(pageWithSidebar(
                )
       ,tabPanel("Gates"
                , checkboxInput("stats", "show proportions", value = TRUE)
-               , checkboxInput("smooth", "smooth", value = FALSE)
-               , checkboxInput("margin", "margin", value = FALSE)
+#                , checkboxInput("smooth", "smooth", value = FALSE)
+#                , checkboxInput("margin", "margin", value = FALSE)
               ,actionButton("actPlotGate","plot")  
                , plotOutput("gate_plot")
             )
