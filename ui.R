@@ -44,13 +44,14 @@ shinyUI(pageWithSidebar(
       ,tabPanel("Stats"
                 ,checkboxInput("boxplot","boxplot",value=TRUE)
                 ,uiOutput("axisCntrol")
+                ,actionButton("actPlotStats","plot")  
                , plotOutput("stats_plot")
                )
       ,tabPanel("Gates"
                , checkboxInput("stats", "show proportions", value = TRUE)
                , checkboxInput("smooth", "smooth", value = FALSE)
                , checkboxInput("margin", "margin", value = FALSE)
-              ,actionButton("actPlot","plot")  
+              ,actionButton("actPlotGate","plot")  
                , plotOutput("gate_plot")
             )
     )

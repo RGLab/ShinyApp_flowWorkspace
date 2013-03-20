@@ -151,8 +151,13 @@ shinyServer(function(input, output) {
         }else{
           c(this_columns(),input$rows,1)  
         }
-      })     
+      })
+      
     output$stats_plot <- renderPlot({
+      if (input$actPlotStats == 0)
+        return()
+      
+      isolate({
         df <- cbind(cur_pd()[rownames(pop_stats()),],pop_stats())
         y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
         x_axis <- input$x_axis
@@ -189,7 +194,7 @@ shinyServer(function(input, output) {
                   ,layout=layout()))
           
         }
-      
+      }) 
     })
  
     
@@ -198,7 +203,7 @@ shinyServer(function(input, output) {
   
   output$gate_plot <- renderPlot({
 #       xbin <- input$xbin
-    if (input$actPlot == 0)
+    if (input$actPlotGate == 0)
       return()
     
    isolate({
