@@ -121,7 +121,37 @@ shinyServer(function(input, output) {
     #       to_display$TESTDT <- NULL
            gvisTable(to_display,list(page="disable"),chartid="name")  
       })
+      nSamples <- reactive({
+        nrow(cur_pd())
+      })
       
+      output$rowsControl <- renderUI({
+          #reset rows when unchecked
+            numericInput("rows","rows:",value=0,min=0)    
+      })
+      this_columns <- reactive({
+        this_row <- input$rows
+        if(this_row == 0){
+          0
+        }else{
+          ceiling(nSamples()/input$rows) 
+        }
+        
+      })
+      
+      output$columnsControl <- renderUI({
+#             browser()
+            helpText(paste("columns",this_columns(),sep=":"))
+      })
+      layout <- reactive({
+#         browser()
+        
+        if(input$rows==0||length(input$rows)==0||!input$custlayout){
+          NULL
+        }else{
+          c(this_columns(),input$rows,1)  
+        }
+      })     
     output$stats_plot <- renderPlot({
         df <- cbind(cur_pd()[rownames(pop_stats()),],pop_stats())
         y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
@@ -133,37 +163,33 @@ shinyServer(function(input, output) {
         if(length(cond)>0&&cond!="name"&&nchar(cond)>0){
           f1 <- paste(f1,cond,sep="|")
         }
-        #       browser()
+        
         f1 <- gsub("\\\\","\\\\\\\\",f1)
         f1 <- as.formula(f1)
+#               browser()
         if(input$boxplot){
           print(bwplot(f1
                  ,data=df
                  ,scales=list(x=list(rot=45))
-                 ,ylab="pop %"))
+                 ,ylab="pop %"
+                 ,layout=layout()))
           
         }else{
           print(xyplot(as.formula(f1)
                  ,data=df
                  ,scales=list(x=list(rot=45))
                  ,ylab="pop %"
-                 ,jitter.x=TRUE))
+                 ,jitter.x=TRUE
+                  ,layout=layout()))
           
         }
       
     })
-#   nSamples <- reactive({
-#     nrow(cur_pd())
-#     })
-#   this_columns <- reactive({
-#      ceiling(nSamples()/input$rows)
-#   })
+ 
+    
 #   
 #       
-#   output$columnsControl <- renderUI({
-# #     browser()
-#     textInput("columns",this_columns())
-#   })
+  
   output$gate_plot <- renderPlot({
 #       xbin <- input$xbin
     if (input$actPlot == 0)
@@ -203,11 +229,7 @@ shinyServer(function(input, output) {
         cond <- NULL
       }
       
-#       if(input$rows>0&&length(input$rows)>0){
-#         layout <- c(this_columns(),input$rows,1)  
-#       }else{
-        layout <- NULL
-#       }
+     
 #         browser()
       print(
         plotGate(x = gs_input()
@@ -219,7 +241,7 @@ shinyServer(function(input, output) {
                  , cond = cond
                  , margin = input$margin 
                  , bool = TRUE
-                 , layout = layout
+                 ,layout=layout()
         )
       )      
    })  

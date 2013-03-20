@@ -14,7 +14,7 @@ shinyUI(pageWithSidebar(
     selectInput("study", "Studies:", 
                  choices = c("HVTN-080-small")
                  ,selected = "HVTN-080-small"
-    )
+              )
     ,uiOutput("PTIDCntrol")  
     ,uiOutput("visitCntrol")
     ,uiOutput("stimCntrol")  
@@ -25,10 +25,12 @@ shinyUI(pageWithSidebar(
     ,checkboxInput("oneLevel", "Convert to one level:"
                    ,value = FALSE)
     , uiOutput("condCntrol")
-#      , checkboxInput("custlayout", "Custom layout", value = FALSE)
-#      ,  numericInput("rows","rows:",value=0,min=0)
-#     ,uiOutput("columnsControl")
-    
+     , checkboxInput("custlayout", "Custom grid layout", value = FALSE)
+    ,conditionalPanel(condition = "input.custlayout == true"
+                      ,uiOutput("rowsControl")
+                      ,uiOutput("columnsControl")
+                    )
+      
     
   ),
   
