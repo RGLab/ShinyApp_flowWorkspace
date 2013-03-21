@@ -49,8 +49,10 @@ shinyUI(pageWithSidebar(
                )
       ,tabPanel("Gates"
                , checkboxInput("stats", "show proportions", value = TRUE)
-#                , checkboxInput("smooth", "smooth", value = FALSE)
-#                , checkboxInput("margin", "margin", value = FALSE)
+                , checkboxInput("isOverlay", "Overlay", value = FALSE)
+                ,conditionalPanel(condition="input.isOverlay == true"
+                                  ,uiOutput("overlayPopCntrol")  
+                                    )
               ,actionButton("actPlotGate","plot")  
                , plotOutput("gate_plot")
             )

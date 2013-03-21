@@ -54,15 +54,31 @@ shinyServer(function(input, output) {
                      ,multiple = TRUE
         )
       })
-      
-      output$popCntrol <- renderUI({
-        populations <- getNodes(gs_selected()[[1]],isPath=TRUE)
+      pop_filtered <-reactive({
+        gh <- gs_selected()[[1]]
+        populations <- getNodes(gh,isPath=TRUE)
         pop_ind <- 1:length(populations)
         names(pop_ind) <- populations
+        pop_ind <- pop_ind[-1]
+        #exclude bool gate
+        bool_ind <- unlist(lapply(pop_ind,function(cur_ind){flowWorkspace:::.isBoolGate(gh,cur_ind)}))
+        pop_ind[!bool_ind]
+      })
+      output$popCntrol <- renderUI({
+#         browser()
+        pop_ind <- pop_filtered()
         selectInput("pops", "Populations:", 
-                      choices = pop_ind[-1]
-                      ,selected = names(pop_ind[74])
+                      choices = pop_ind
+                      ,selected = names(pop_ind[5])
                       ,multiple = FALSE)
+      })
+      output$overlayPopCntrol <- renderUI({
+        #         browser()
+        pop_ind <- pop_filtered()
+        
+        selectInput("overlay_pops", "", 
+                    choices = pop_ind
+                    )
       })
       
       output$groupCntrol <- renderUI({
@@ -240,6 +256,14 @@ shinyServer(function(input, output) {
       if(length(cond)==0||cond=="name"||nchar(cond)==0){
         cond <- NULL
       }
+#       browser()
+      overlay <-  input$overlay_pops
+      if(length(overlay) == 0||!input$isOverlay){
+        overlay <- NULL
+      }else{
+        overlay <- as.numeric(overlay)
+      }
+        
       
      
 #         browser()
@@ -251,8 +275,9 @@ shinyServer(function(input, output) {
                  , smooth = FALSE
                  , digits = digits
                  , cond = cond
-                 , margin = FALSE
+                 , margin = TRUE
                  , bool = TRUE
+                 , overlay = overlay
                  ,layout=layout()
         )
       )      
