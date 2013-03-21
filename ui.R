@@ -38,9 +38,12 @@ shinyUI(pageWithSidebar(
   # of the generated distribution
   mainPanel(
     tabsetPanel(
-      tabPanel("summary"
+      tabPanel("Summary"
                , htmlOutput("summary")
                )
+      ,tabPanel("Gate Hierarchy"
+                , plotOutput("gh_plot")
+      )
       ,tabPanel("Stats"
                 ,checkboxInput("boxplot","boxplot",value=TRUE)
                 ,uiOutput("axisCntrol")

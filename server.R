@@ -24,7 +24,9 @@ shinyServer(function(input, output) {
       pd_selected <- reactive({
         pData(gs_selected())
       })
-      
+      output$gh_plot <- renderPlot({
+        plot(gs_selected()[[1]] )
+      })
       output$PTIDCntrol <- renderUI({
     #     browser()
         PTID <- unique(as.character(pd_selected()$PTID))
