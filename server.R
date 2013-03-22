@@ -1,4 +1,9 @@
 library(googleVis)
+library(flowWorkspace)
+path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
+gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN-080-small"))
+gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
+
 shinyServer(function(input, output) {
 #   browser()
       study_selected <- reactive({
