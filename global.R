@@ -1,52 +1,8 @@
 library(shiny)
 library(flowWorkspace)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
-unarchive_new<-function(path){
-  
-  if(!file.exists(path))
-    stop(file,"' not found!")
-#   browser()
-  files<-list.files(path)
-  
-  dat.file<-file.path(path,files[grep(".dat$",files)])
-  rds.file<-file.path(path,files[grep(".rds$",files)])
-  
-  nc.file<-file.path(path,files[grep(".nc$|.nc.trans$",files)])
-  #	browser()
-  if(length(dat.file)==0)
-    stop(".dat file missing in ",file)
-  if(length(dat.file)>1)
-    stop("multiple .dat files found in ",file)
-  if(length(rds.file)==0)
-    stop(".rds file missing in ",file)
-  if(length(rds.file)>1)
-    stop("multiple .rds files found in ",file)
-  
-  message("loading R object...")
-  gs<-readRDS(rds.file)
-  
-  message("loading tree object...")
-  gs@pointer<-.Call("R_loadGatingSet",dat.file)
-  #update the pointer in each gating hierarchy
-  for(i in 1:length(gs@set))
-  {
-    gs@set[[i]]@pointer<-gs@pointer
-  }
-  if(flowWorkspace:::isNcdf(gs[[1]]))
-  {
-    if(length(nc.file)==0)
-      stop(".nc file missing in ",file)
-    ncFlowSet(gs)@file<-nc.file
-    
-  }
-  
-  #clean up the intermediate files
-  message("Done")
-  return (gs)
-  
-}
-gs_small <- unarchive_new(file.path(path,"HVTN-080-small"))
-# gs_big <- unarchive_new(file.path(path,"HVTN-080-big"))
+gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN-080-small"))
+# gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
 #preprocess pdata
 # pd <- pData(gs_small)
 # #make Stim column for negctrl unqiue

@@ -13,9 +13,9 @@ shinyServer(function(input, output) {
       gs_selected <- reactive({
         this_study <- study_selected()
         if(this_study == "HVTN-080-small"){
-          gs_small
-        }else if(this_study == "HVTN-080-big"){
-          gs_big
+          gs_HVTN_small
+        }else if(this_study == "RV144"){
+          gs_RV144
         }else{
           stop("not valid study!")
         }
@@ -147,20 +147,15 @@ shinyServer(function(input, output) {
           #reset rows when unchecked
             numericInput("rows","rows:",value=0,min=0)    
       })
-#       this_columns <- reactive({
-#         this_row <- input$rows
-#         if(this_row == 0){
-#           0
-#         }else{
-#           ceiling(nSamples()/input$rows) 
-#         }
-#         
+#       output$widthControl <- renderUI({
+#         #reset rows when unchecked
+#         numericInput("w_width","width:",value=0,min=0)    
 #       })
+      output$heightControl <- renderUI({
+        #reset rows when unchecked
+        numericInput("w_height","height:",value=400,min=0)    
+      })
       
-#       output$columnsControl <- renderUI({
-# #             browser()
-#             helpText(paste("columns",this_columns(),sep=":"))
-#       })
       layout <- reactive({
 #         browser()
         
@@ -171,7 +166,35 @@ shinyServer(function(input, output) {
           c(NA,input$rows,1)  
         }
       })
-      
+      w_height <- reactive({
+        this_height <- input$w_height
+        if(this_height==0||length(this_height)==0||!input$custWinSize){
+          this_height <- 400
+        }
+        this_height
+      })
+      get_w_height_stats <- function(){
+#         browser()
+        if (input$actPlotStats == 0)
+          return(400)
+        isolate({w_height()})
+      }
+      get_w_height_gate <- function(){
+#         browser()
+        if (input$actPlotGate == 0)
+          return(400)
+        isolate({w_height()})
+      }
+#       w_width <- function(){
+#         #         browser()
+#         this_width <- input$w_width
+#         if(this_width==0||length(this_width)==0||!input$custWinSize){
+#           this_width <- "auto"
+#         }
+#         this_width
+#         
+#       }
+
     output$stats_plot <- renderPlot({
       if (input$actPlotStats == 0)
         return()
@@ -214,14 +237,17 @@ shinyServer(function(input, output) {
           
         }
       }) 
-    })
+    }
+      ,height = get_w_height_stats
+#       ,width = get_w_width() 
+    )
  
     
-#   
-#       
+  
+      
   
   output$gate_plot <- renderPlot({
-#       xbin <- input$xbin
+      xbin <- input$xbin
     if (input$actPlotGate == 0)
       return()
     
@@ -285,5 +311,5 @@ shinyServer(function(input, output) {
       )      
    })  
     
-  })
+  },height = get_w_height_gate)
 })

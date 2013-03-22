@@ -12,7 +12,7 @@ shinyUI(pageWithSidebar(
 #     h4("Filters:")
     
     selectInput("study", "Studies:", 
-                 choices = c("HVTN-080-small")
+                 choices = c("HVTN-080-small","RV144")
                  ,selected = "HVTN-080-small"
               )
     ,uiOutput("PTIDCntrol")  
@@ -30,6 +30,12 @@ shinyUI(pageWithSidebar(
                       ,uiOutput("rowsControl")
                       ,uiOutput("columnsControl")
                     )
+    , checkboxInput("custWinSize", "Custom plot size", value = FALSE)
+    ,conditionalPanel(condition = "input.custWinSize == true"
+#                       ,uiOutput("widthControl")
+                      ,uiOutput("heightControl")
+                    )
+    
       
     
   ),
@@ -48,7 +54,9 @@ shinyUI(pageWithSidebar(
                 ,checkboxInput("boxplot","boxplot",value=TRUE)
                 ,uiOutput("axisCntrol")
                 ,actionButton("actPlotStats","plot")  
-               , plotOutput("stats_plot")
+               , plotOutput("stats_plot"
+                            ,height = "auto"
+                            )
                )
       ,tabPanel("Gates"
                , checkboxInput("stats", "show proportions", value = TRUE)
