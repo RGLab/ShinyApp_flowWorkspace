@@ -15,7 +15,9 @@ shinyUI(pageWithSidebar(
                  choices = c("HVTN-small","RV144")
                  ,selected = "HVTN-small"
               )
-      ,uiOutput("FilterControls")  
+      ,uiOutput("FilterControls")
+    ,uiOutput("popCntrol")  
+    
     
     ,uiOutput("groupCntrol")  
     

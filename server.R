@@ -6,9 +6,9 @@ gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN_small"))
 pd_HVTN_small <-pData(gs_HVTN_small)
 stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
-gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
-pd_RV144 <- pData(gs_RV144)
-stats_RV144 <- getPopStats(gs_RV144)
+# gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
+# pd_RV144 <- pData(gs_RV144)
+# stats_RV144 <- getPopStats(gs_RV144)
 
 
 
@@ -76,35 +76,7 @@ shinyServer(function(input, output) {
       })
       
       
-#       output$PTIDCntrol <- renderUI({
-#     #     browser()
-#         PTID <- unique(as.character(pd_preloaded()$PTID))
-#         selectInput("PTID", "Subjects:", 
-#                     choices = PTID
-#                     ,selected = PTID[1]
-#                     ,multiple = TRUE
-#         )
-#       })
-#       
-#       
-#       output$visitCntrol <- renderUI({
-#         VISITNO <- unique(as.character(pd_preloaded()$VISITNO))
-#         selectInput("VISITNO", "Visits:", 
-#                      choices = VISITNO
-#                      ,selected = VISITNO[1]
-#                      ,multiple = TRUE
-#         )
-#       })
-#       output$stimCntrol <- renderUI({
-#         
-#         Stim <- unique(as.character(pd_preloaded()$Stim))
-#         
-#         selectInput("Stim", "Stimulation:", 
-#                      choices = Stim
-#                      ,selected = Stim
-#                      ,multiple = TRUE
-#         )
-#       })
+
       pop_filtered <-reactive({
         gh <- gs_preloaded()[[1]]
         populations <- getNodes(gh,isPath=TRUE)
@@ -175,6 +147,7 @@ shinyServer(function(input, output) {
       })
       
       pop_stats_selected <- reactive({
+#         browser()
         pop_ind <- as.integer(input$pops)
         p_stat <- stats_preloaded()[pop_ind,,drop=FALSE]
         t(p_stat)
@@ -234,20 +207,11 @@ shinyServer(function(input, output) {
           return(400)
         isolate({w_height()})
       }
-#       w_width <- function(){
-#         #         browser()
-#         this_width <- input$w_width
-#         if(this_width==0||length(this_width)==0||!input$custWinSize){
-#           this_width <- "auto"
-#         }
-#         this_width
-#         
-#       }
 
     output$stats_plot <- renderPlot({
       if (input$actPlotStats == 0)
         return()
-      
+#       browser()
       isolate({
         df <- cbind(cur_pd()[rownames(pop_stats_selected()),],pop_stats_selected())
         y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
