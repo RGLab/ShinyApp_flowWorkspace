@@ -12,13 +12,10 @@ shinyUI(pageWithSidebar(
 #     h4("Filters:")
     
     selectInput("study", "Studies:", 
-                 choices = c("HVTN-080-small","RV144")
-                 ,selected = "HVTN-080-small"
+                 choices = c("HVTN-small","RV144")
+                 ,selected = "HVTN-small"
               )
-    ,uiOutput("PTIDCntrol")  
-    ,uiOutput("visitCntrol")
-    ,uiOutput("stimCntrol")  
-    ,uiOutput("popCntrol")  
+      ,uiOutput("FilterControls")  
     
     ,uiOutput("groupCntrol")  
     

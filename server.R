@@ -2,13 +2,15 @@ library(googleVis)
 library(flowWorkspace)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 #pre-load gatingset,pdata and stats
-gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN-080-small"))
+gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN_small"))
 pd_HVTN_small <-pData(gs_HVTN_small)
 stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
 gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
 pd_RV144 <- pData(gs_RV144)
 stats_RV144 <- getPopStats(gs_RV144)
+
+
 
 shinyServer(function(input, output) {
 #   browser()
@@ -23,7 +25,7 @@ shinyServer(function(input, output) {
       
       gs_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-080-small"){
+        if(this_study == "HVTN-small"){
           gs_HVTN_small
         }else if(this_study == "RV144"){
           gs_RV144
@@ -33,7 +35,7 @@ shinyServer(function(input, output) {
       })
       pd_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-080-small"){
+        if(this_study == "HVTN-small"){
           pd_HVTN_small
         }else if(this_study == "RV144"){
           pd_RV144
@@ -43,7 +45,7 @@ shinyServer(function(input, output) {
       })
       stats_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-080-small"){
+        if(this_study == "HVTN-small"){
           stats_HVTN_small
         }else if(this_study == "RV144"){
           stats_RV144
@@ -55,35 +57,54 @@ shinyServer(function(input, output) {
       output$gh_plot <- renderPlot({
         plot(gs_preloaded()[[1]] )
       })
-      output$PTIDCntrol <- renderUI({
-    #     browser()
-        PTID <- unique(as.character(pd_preloaded()$PTID))
-        selectInput("PTID", "Subjects:", 
-                    choices = PTID
-                    ,selected = PTID[1]
-                    ,multiple = TRUE
-        )
+      output$FilterControls <- renderUI({
+            this_pd <- pd_preloaded()
+            study_variables <- colnames(this_pd)
+            name_ind <- match("name",study_variables)
+            study_variables <- study_variables[-name_ind]
+            lapply(study_variables,function(this_variable){
+              this_choices <- unique(as.character(this_pd[,this_variable]))
+              selectInput(this_variable, this_variable, 
+                          choices = this_choices
+                          ,selected = this_choices[1]
+                          ,multiple = TRUE
+              )
+            })
+        #     browser()
+                
+        
       })
       
       
-      output$visitCntrol <- renderUI({
-        VISITNO <- unique(as.character(pd_preloaded()$VISITNO))
-        selectInput("VISITNO", "Visits:", 
-                     choices = VISITNO
-                     ,selected = VISITNO[1]
-                     ,multiple = TRUE
-        )
-      })
-      output$stimCntrol <- renderUI({
-        
-        Stim <- unique(as.character(pd_preloaded()$Stim))
-        
-        selectInput("Stim", "Stimulation:", 
-                     choices = Stim
-                     ,selected = Stim
-                     ,multiple = TRUE
-        )
-      })
+#       output$PTIDCntrol <- renderUI({
+#     #     browser()
+#         PTID <- unique(as.character(pd_preloaded()$PTID))
+#         selectInput("PTID", "Subjects:", 
+#                     choices = PTID
+#                     ,selected = PTID[1]
+#                     ,multiple = TRUE
+#         )
+#       })
+#       
+#       
+#       output$visitCntrol <- renderUI({
+#         VISITNO <- unique(as.character(pd_preloaded()$VISITNO))
+#         selectInput("VISITNO", "Visits:", 
+#                      choices = VISITNO
+#                      ,selected = VISITNO[1]
+#                      ,multiple = TRUE
+#         )
+#       })
+#       output$stimCntrol <- renderUI({
+#         
+#         Stim <- unique(as.character(pd_preloaded()$Stim))
+#         
+#         selectInput("Stim", "Stimulation:", 
+#                      choices = Stim
+#                      ,selected = Stim
+#                      ,multiple = TRUE
+#         )
+#       })
       pop_filtered <-reactive({
         gh <- gs_preloaded()[[1]]
         populations <- getNodes(gh,isPath=TRUE)
