@@ -1,8 +1,14 @@
 library(googleVis)
 library(flowWorkspace)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
+#pre-load gatingset,pdata and stats
 gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN-080-small"))
-gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
+pd_HVTN_small <-pData(gs_HVTN_small)
+stats_HVTN_small <- getPopStats(gs_HVTN_small)
+
+# gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
+# pd_RV144 <- pData(gs_RV144)
+# stats_RV144 <- getPopStats(gs_RV144)
 
 shinyServer(function(input, output) {
 #   browser()
@@ -15,7 +21,7 @@ shinyServer(function(input, output) {
         headerPanel(study_selected(),"flowWorkspace & flowViz")
       })
       
-      gs_selected <- reactive({
+      gs_preloaded <- reactive({
         this_study <- study_selected()
         if(this_study == "HVTN-080-small"){
           gs_HVTN_small
@@ -25,16 +31,33 @@ shinyServer(function(input, output) {
           stop("not valid study!")
         }
       })
-      
-      pd_selected <- reactive({
-        pData(gs_selected())
+      pd_preloaded <- reactive({
+        this_study <- study_selected()
+        if(this_study == "HVTN-080-small"){
+          pd_HVTN_small
+        }else if(this_study == "RV144"){
+          pd_RV144
+        }else{
+          stop("not valid study!")
+        }
       })
+      stats_preloaded <- reactive({
+        this_study <- study_selected()
+        if(this_study == "HVTN-080-small"){
+          stats_HVTN_small
+        }else if(this_study == "RV144"){
+          stats_RV144
+        }else{
+          stop("not valid study!")
+        }
+      })
+      
       output$gh_plot <- renderPlot({
-        plot(gs_selected()[[1]] )
+        plot(gs_preloaded()[[1]] )
       })
       output$PTIDCntrol <- renderUI({
     #     browser()
-        PTID <- unique(as.character(pd_selected()$PTID))
+        PTID <- unique(as.character(pd_preloaded()$PTID))
         selectInput("PTID", "Subjects:", 
                     choices = PTID
                     ,selected = PTID[1]
@@ -44,7 +67,7 @@ shinyServer(function(input, output) {
       
       
       output$visitCntrol <- renderUI({
-        VISITNO <- unique(as.character(pd_selected()$VISITNO))
+        VISITNO <- unique(as.character(pd_preloaded()$VISITNO))
         selectInput("VISITNO", "Visits:", 
                      choices = VISITNO
                      ,selected = VISITNO[1]
@@ -53,7 +76,7 @@ shinyServer(function(input, output) {
       })
       output$stimCntrol <- renderUI({
         
-        Stim <- unique(as.character(pd_selected()$Stim))
+        Stim <- unique(as.character(pd_preloaded()$Stim))
         
         selectInput("Stim", "Stimulation:", 
                      choices = Stim
@@ -62,7 +85,7 @@ shinyServer(function(input, output) {
         )
       })
       pop_filtered <-reactive({
-        gh <- gs_selected()[[1]]
+        gh <- gs_preloaded()[[1]]
         populations <- getNodes(gh,isPath=TRUE)
         pop_ind <- 1:length(populations)
         names(pop_ind) <- populations
@@ -90,7 +113,7 @@ shinyServer(function(input, output) {
       
       output$groupCntrol <- renderUI({
         selectInput("group", "Group by:", 
-                     choices = colnames(pd_selected())
+                     choices = colnames(pd_preloaded())
                      ,selected = "VISITNO"
                      ,multiple = TRUE
         )
@@ -98,7 +121,7 @@ shinyServer(function(input, output) {
       output$axisCntrol <- renderUI({
     
         selectInput("x_axis", "X-axis", 
-                    choices = colnames(pd_selected())
+                    choices = colnames(pd_preloaded())
                     ,selected = "Stim"
                     ,multiple = FALSE)
       })
@@ -113,7 +136,7 @@ shinyServer(function(input, output) {
         })
       
       selected_samples <- reactive({
-        this_samples <- as.character(subset(pd_selected()
+        this_samples <- as.character(subset(pd_preloaded()
                , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
           )
           if(length(this_samples) == 0)this_samples = 1
@@ -122,17 +145,17 @@ shinyServer(function(input, output) {
       
       cur_pd <- reactive({
 #         browser()
-        pd_selected()[selected_samples(),]
+        pd_preloaded()[selected_samples(),]
       })
       # Reactive expression
        gs_input <- reactive({
-         gs_selected()[selected_samples()]
+         gs_preloaded()[selected_samples()]
     
       })
-        
-      pop_stats <- reactive({
+      
+      pop_stats_selected <- reactive({
         pop_ind <- as.integer(input$pops)
-        p_stat <- getPopStats(gs_input())[pop_ind,,drop=FALSE]
+        p_stat <- stats_preloaded()[pop_ind,,drop=FALSE]
         t(p_stat)
       })
         
@@ -140,7 +163,7 @@ shinyServer(function(input, output) {
       output$summary <- renderGvis({
     #     browser()
           to_display <- cur_pd()
-    #       to_display <- cbind(to_display,pop_stats())
+    #       to_display <- cbind(to_display,pop_stats_selected())
     #       to_display$TESTDT <- NULL
            gvisTable(to_display,list(page="disable"),chartid="name")  
       })
@@ -205,7 +228,7 @@ shinyServer(function(input, output) {
         return()
       
       isolate({
-        df <- cbind(cur_pd()[rownames(pop_stats()),],pop_stats())
+        df <- cbind(cur_pd()[rownames(pop_stats_selected()),],pop_stats_selected())
         y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
         x_axis <- input$x_axis
         f1 <- paste("`",y_axis,"`~`",x_axis,"`",sep="")
