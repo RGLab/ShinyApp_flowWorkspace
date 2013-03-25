@@ -6,9 +6,9 @@ gs_HVTN_small <- flowWorkspace:::load_gs(path=file.path(path,"HVTN_small"))
 pd_HVTN_small <-pData(gs_HVTN_small)
 stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
-gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
-pd_RV144 <- pData(gs_RV144)
-stats_RV144 <- getPopStats(gs_RV144)
+# gs_RV144 <- flowWorkspace:::load_gs(path=file.path(path,"RV144"))
+# pd_RV144 <- pData(gs_RV144)
+# stats_RV144 <- getPopStats(gs_RV144)
 
 
 
@@ -155,11 +155,16 @@ shinyServer(function(input, output) {
         
       # pdata output
       output$summary <- renderGvis({
-    #     browser()
-          to_display <- cur_pd()
-    #       to_display <- cbind(to_display,pop_stats_selected())
-    #       to_display$TESTDT <- NULL
-           gvisTable(to_display,list(page="disable"),chartid="name")  
+          
+          if (input$actSummary == 0)
+            return()
+          #       browser()
+          isolate({
+            to_display <- cur_pd()
+      #       to_display <- cbind(to_display,pop_stats_selected())
+      #       to_display$TESTDT <- NULL
+             gvisTable(to_display,list(page="disable"),chartid="name")  
+          })      
       })
       nSamples <- reactive({
         nrow(cur_pd())
