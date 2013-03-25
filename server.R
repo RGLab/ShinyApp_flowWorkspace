@@ -1,4 +1,4 @@
-library(googleVis)
+# library(googleVis)
 library(flowWorkspace)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 #pre-load gatingset,pdata and stats
@@ -153,19 +153,7 @@ shinyServer(function(input, output) {
         t(p_stat)
       })
         
-      # pdata output
-      output$summary <- renderGvis({
-          
-          if (input$actSummary == 0)
-            return()
-          #       browser()
-          isolate({
-            to_display <- cur_pd()
-      #       to_display <- cbind(to_display,pop_stats_selected())
-      #       to_display$TESTDT <- NULL
-             gvisTable(to_display,list(page="disable"),chartid="name")  
-          })      
-      })
+     
       nSamples <- reactive({
         nrow(cur_pd())
       })
@@ -212,7 +200,19 @@ shinyServer(function(input, output) {
           return(400)
         isolate({w_height()})
       }
-
+      # pdata output
+      output$summary <- renderTable({
+        
+#         if (input$actSummary == 0)
+#           return()
+# 
+#         isolate({
+          to_display <- cur_pd()
+          
+          to_display
+          #              gvisTable(to_display,list(page="disable"),chartid="name")  
+#         })      
+      })
     output$stats_plot <- renderPlot({
       if (input$actPlotStats == 0)
         return()

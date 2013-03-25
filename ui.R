@@ -44,7 +44,7 @@ shinyUI(pageWithSidebar(
   mainPanel(
     tabsetPanel(
       tabPanel("Summary"
-               ,actionButton("actSummary","update")  
+#                ,actionButton("actSummary","update")  
                , htmlOutput("summary")
                )
       ,tabPanel("Gate Hierarchy"
