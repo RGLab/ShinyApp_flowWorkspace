@@ -112,16 +112,21 @@ shinyServer(function(input, output) {
           textInput("cond", "group selected:", value = group_v)  
         })
       
+      selected_samples <- reactive({
+        this_samples <- as.character(subset(pd_selected()
+               , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
+          )
+          if(length(this_samples) == 0)this_samples = 1
+            this_samples
+      })
       
+      cur_pd <- reactive({
+#         browser()
+        pd_selected()[selected_samples(),]
+      })
       # Reactive expression
        gs_input <- reactive({
-    #      browser()
-         selected_samples <- as.character(
-           subset(pd_selected()
-                  , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
-         )
-         if(length(selected_samples) == 0)selected_samples = 1
-         gs_selected()[selected_samples]
+         gs_selected()[selected_samples()]
     
       })
         
@@ -129,11 +134,6 @@ shinyServer(function(input, output) {
         pop_ind <- as.integer(input$pops)
         p_stat <- getPopStats(gs_input())[pop_ind,,drop=FALSE]
         t(p_stat)
-      })
-        
-      cur_pd <- reactive({
-    #     browser()
-        pData(gs_input())
       })
         
       # pdata output
@@ -316,5 +316,7 @@ shinyServer(function(input, output) {
       )      
    })  
     
-  },height = get_w_height_gate)
+  }
+  ,height = get_w_height_gate
+  )
 })
