@@ -3,13 +3,22 @@ library(flowWorkspace)
 library(flowIncubator)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 #pre-load gatingset,pdata and stats
-gs_HVTN_small <- load_gs(path=file.path(path,"HVTN_small"))
-pd_HVTN_small <-pData(gs_HVTN_small)
-stats_HVTN_small <- getPopStats(gs_HVTN_small)
+# gs_HVTN_small <- load_gs(path=file.path(path,"HVTN_small"))
+# pd_HVTN_small <-pData(gs_HVTN_small)
+# stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
-gs_RV144 <- load_gs(path=file.path(path,"RV144"))
-pd_RV144 <- pData(gs_RV144)
-stats_RV144 <- getPopStats(gs_RV144)
+gs_HVTN_1 <- load_gs(path=file.path(path,"HVTN_1"))
+pd_HVTN_1 <-pData(gs_HVTN_1)
+stats_HVTN_1 <- getPopStats(gs_HVTN_1)
+
+gs_HVTN_2 <- load_gs(path=file.path(path,"HVTN_2"))
+pd_HVTN_2 <-pData(gs_HVTN_2)
+stats_HVTN_2 <- getPopStats(gs_HVTN_2)
+
+
+# gs_RV144 <- load_gs(path=file.path(path,"RV144_subset"))
+# pd_RV144 <- pData(gs_RV144)
+# stats_RV144 <- getPopStats(gs_RV144)
 
 
 
@@ -26,8 +35,10 @@ shinyServer(function(input, output) {
       
       gs_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-small"){
-          gs_HVTN_small
+        if(this_study == "HVTN-A"){
+          gs_HVTN_1
+        }else if(this_study == "HVTN-B"){
+          gs_HVTN_2
         }else if(this_study == "RV144"){
           gs_RV144
         }else{
@@ -36,8 +47,10 @@ shinyServer(function(input, output) {
       })
       pd_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-small"){
-          pd_HVTN_small
+        if(this_study == "HVTN-A"){
+          pd_HVTN_1
+        }else if(this_study == "HVTN-B"){
+          pd_HVTN_2
         }else if(this_study == "RV144"){
           pd_RV144
         }else{
@@ -46,8 +59,10 @@ shinyServer(function(input, output) {
       })
       stats_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-small"){
-          stats_HVTN_small
+        if(this_study == "HVTN-A"){
+          stats_HVTN_1
+        }else if(this_study == "HVTN-B"){
+          stats_HVTN_2
         }else if(this_study == "RV144"){
           stats_RV144
         }else{
