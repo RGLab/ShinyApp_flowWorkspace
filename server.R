@@ -16,9 +16,9 @@ pd_HVTN_2 <-pData(gs_HVTN_2)
 stats_HVTN_2 <- getPopStats(gs_HVTN_2)
 
 
-# gs_RV144 <- load_gs(path=file.path(path,"RV144_subset"))
-# pd_RV144 <- pData(gs_RV144)
-# stats_RV144 <- getPopStats(gs_RV144)
+gs_RV144 <- load_gs(path=file.path(path,"RV144_new"))
+pd_RV144 <- pData(gs_RV144)
+stats_RV144 <- getPopStats(gs_RV144)
 
 
 
