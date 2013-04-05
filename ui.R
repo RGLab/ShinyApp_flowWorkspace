@@ -12,8 +12,8 @@ shinyUI(pageWithSidebar(
 #     h4("Filters:")
     
     selectInput("study", "Studies:", 
-                 choices = c("HVTN-A","HVTN-B","RV144")
-                 ,selected = "HVTN-A"
+                 choices = c("HVTN","RV144")
+                 ,selected = "HVTN"
               )
       ,uiOutput("FilterControls")
     ,uiOutput("popCntrol")  

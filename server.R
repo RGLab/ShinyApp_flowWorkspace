@@ -7,16 +7,12 @@ path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 # pd_HVTN_small <-pData(gs_HVTN_small)
 # stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
-gs_HVTN_1 <- load_gs(path=file.path(path,"HVTN_1"))
-pd_HVTN_1 <-pData(gs_HVTN_1)
-stats_HVTN_1 <- getPopStats(gs_HVTN_1)
-
-gs_HVTN_2 <- load_gs(path=file.path(path,"HVTN_2"))
-pd_HVTN_2 <-pData(gs_HVTN_2)
-stats_HVTN_2 <- getPopStats(gs_HVTN_2)
+gs_HVTN <- load_gs(path=file.path(path,"HVTN"))
+pd_HVTN <-pData(gs_HVTN)
+stats_HVTN <- getPopStats(gs_HVTN)
 
 
-gs_RV144 <- load_gs(path=file.path(path,"RV144_new"))
+gs_RV144 <- load_gs(path=file.path(path,"RV144"))
 pd_RV144 <- pData(gs_RV144)
 stats_RV144 <- getPopStats(gs_RV144)
 
@@ -35,10 +31,8 @@ shinyServer(function(input, output) {
       
       gs_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-A"){
-          gs_HVTN_1
-        }else if(this_study == "HVTN-B"){
-          gs_HVTN_2
+        if(this_study == "HVTN"){
+          gs_HVTN
         }else if(this_study == "RV144"){
           gs_RV144
         }else{
@@ -47,10 +41,8 @@ shinyServer(function(input, output) {
       })
       pd_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-A"){
-          pd_HVTN_1
-        }else if(this_study == "HVTN-B"){
-          pd_HVTN_2
+        if(this_study == "HVTN"){
+          pd_HVTN
         }else if(this_study == "RV144"){
           pd_RV144
         }else{
@@ -59,10 +51,8 @@ shinyServer(function(input, output) {
       })
       stats_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN-A"){
-          stats_HVTN_1
-        }else if(this_study == "HVTN-B"){
-          stats_HVTN_2
+        if(this_study == "HVTN"){
+          stats_HVTN
         }else if(this_study == "RV144"){
           stats_RV144
         }else{
@@ -138,7 +128,7 @@ shinyServer(function(input, output) {
       output$condCntrol <- renderUI({
 #         browser()
           group_v <-  input$group
-          group_v <- unlist(lapply(group_v,function(cur_group){paste("factor(",cur_group,")",sep="")}))
+#           group_v <- unlist(lapply(group_v,function(cur_group){paste("factor(",cur_group,")",sep="")}))
           cond_type <- ifelse(input$oneLevel,":","+")
           group_v <- paste(group_v,collapse=cond_type)
           textInput("cond", "group selected:", value = group_v)  
