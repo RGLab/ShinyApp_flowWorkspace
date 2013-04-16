@@ -73,7 +73,7 @@ shinyServer(function(input, output) {
               if(this_variable == "PTID"){
                 this_selected <- this_choices[1]  
               }else{
-                this_selected <- this_choices[1:2]
+                this_selected <- this_choices[1:length(this_choices)]
               }
               
               
