@@ -70,9 +70,16 @@ shinyServer(function(input, output) {
             study_variables <- study_variables[-name_ind]
             lapply(study_variables,function(this_variable){
               this_choices <- unique(as.character(this_pd[,this_variable]))
+              if(this_variable == "PTID"){
+                this_selected <- this_choices[1]  
+              }else{
+                this_selected <- this_choices
+              }
+              
+              
               selectInput(this_variable, this_variable, 
                           choices = this_choices
-                          ,selected = this_choices[1]
+                          ,selected = this_selected
                           ,multiple = TRUE
               )
             })
