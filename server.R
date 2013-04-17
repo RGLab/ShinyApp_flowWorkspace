@@ -1,5 +1,5 @@
 # library(googleVis)
-library(flowWorkspace)
+# library(flowWorkspace)
 library(flowIncubator)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 #pre-load gatingset,pdata and stats
@@ -7,7 +7,7 @@ path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 # pd_HVTN_small <-pData(gs_HVTN_small)
 # stats_HVTN_small <- getPopStats(gs_HVTN_small)
 
-gs_HVTN <- load_gs(path=file.path(path,"HVTN"))
+gs_HVTN <- load_gslist(path=file.path(path,"HVTN"))
 pd_HVTN <-pData(gs_HVTN)
 stats_HVTN <- getPopStats(gs_HVTN)
 
