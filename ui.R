@@ -48,6 +48,7 @@ shinyUI(pageWithSidebar(
                , htmlOutput("summary")
                )
       ,tabPanel("Gate Hierarchy"
+                ,uiOutput("rootCntrol")
                 , plotOutput("gh_plot")
       )
       ,tabPanel("Stats"

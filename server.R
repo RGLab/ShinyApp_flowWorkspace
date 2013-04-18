@@ -3,9 +3,11 @@
 library(flowIncubator)
 path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
 #pre-load gatingset,pdata and stats
-# gs_HVTN_small <- load_gs(path=file.path(path,"HVTN_small"))
-# pd_HVTN_small <-pData(gs_HVTN_small)
-# stats_HVTN_small <- getPopStats(gs_HVTN_small)
+
+#test set
+# gs_HVTN <- load_gs(path=file.path(path,"HVTN/gs30141ebe77c4"))
+# pd_HVTN <-pData(gs_HVTN)
+# stats_HVTN <- getPopStats(gs_HVTN)
 
 gs_HVTN <- load_gslist(path=file.path(path,"HVTN"))
 pd_HVTN <-pData(gs_HVTN)
@@ -61,7 +63,7 @@ shinyServer(function(input, output) {
       })
       
       output$gh_plot <- renderPlot({
-        plot(gs_preloaded()[[1]] )
+        plot(gs_preloaded()[[1]], input$root_selected)
       })
       output$FilterControls <- renderUI({
             this_pd <- pd_preloaded()
@@ -123,6 +125,18 @@ shinyServer(function(input, output) {
                      ,selected = "VISITNO"
                      ,multiple = TRUE
         )
+      })
+      
+      output$rootCntrol <- renderUI({
+        gh <- gs_preloaded()[[1]]
+        allNodes <- getNodes(gh)
+        isLeaf <- sapply(allNodes, function(this_node){
+              length(getChildren(gh,this_node))==0
+        })
+        selectInput("root_selected", "select root", 
+                    choices = allNodes[!isLeaf]
+                    ,selected = "root"
+                    ,multiple = FALSE)
       })
       output$axisCntrol <- renderUI({
     
