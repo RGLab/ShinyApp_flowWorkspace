@@ -149,7 +149,6 @@ shinyServer(function(input, output) {
       output$condCntrol <- renderUI({
 #         browser()
           group_v <-  input$group
-#           group_v <- unlist(lapply(group_v,function(cur_group){paste("factor(",cur_group,")",sep="")}))
           cond_type <- ifelse(input$oneLevel,":","+")
           group_v <- paste(group_v,collapse=cond_type)
           textInput("cond", "group selected:", value = group_v)  
@@ -198,11 +197,45 @@ shinyServer(function(input, output) {
         numericInput("w_height","height:",value=400,min=0)    
       })
       
+      #calculate the appropriate nrow* ncol for lattice
+      #always set page as 1 since shiny does not know
+      #how to render multi-page pdf yet
+      auto_layout <- function(studyVarsArray){
+        
+          subpd <- cur_pd()
+#           newpd <- as.data.frame(
+#             lapply(
+#               subpd,
+#               function(x) {
+#                 if( ! all( is.na(x) ) ) {
+#                   gdata:::drop.levels(x);
+#                 } else {
+#                   x;
+#                 }
+#               }
+#             )
+#           );
+#           rownames( newpd ) <- rownames( subpd );
+#           colnames( newpd ) <- colnames( subpd );
+#           subG <- gs_input()
+#           pData( subG ) <- newpd;
+#           
+#           newpd <- newpd[ , gsub( "`", "", (studyVarsArray) ) ];
+#           npanels <- prod( do.call( c, lapply( newpd, nlevels) ) );
+#           # set the number of columns to the number of levels in the first study variable
+#           dim <- do.call( c, lapply( newpd, nlevels) )[[1]];
+#           browser()
+          dim <- nlevels(factor(subpd[,studyVarsArray[1]]))
+          c( dim, NA, 1 );
+        
+      }
       layout <- reactive({
-#         browser()
         
         if(input$rows==0||length(input$rows)==0||!input$custlayout){
-          NULL
+#           browser()
+          cond <- input$cond
+          cond_variables <- strsplit(split = "\\+", cond)[[1]]
+          auto_layout(cond_variables)
         }else{
 #           c(this_columns(),input$rows,1)  
           c(NA,input$rows,1)  
