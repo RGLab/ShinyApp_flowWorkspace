@@ -19,7 +19,7 @@ for(this_study in studies){
     gs[[this_study]] <- load_gs(path=this_path)
   }
 
- pd[[this_study]]  <-pData(gs[[this_study]] )[,-c(6:7)]
+ pd[[this_study]]  <-pData(gs[[this_study]] )
  stats[[this_study]]  <- getPopStats(gs[[this_study]])
 
 }
@@ -55,6 +55,7 @@ shinyServer(function(input, output) {
         plot(gs_preloaded()[[1]], input$root_selected)
       })
       output$FilterControls <- renderUI({
+        
             this_pd <- pd_preloaded()
             study_variables <- colnames(this_pd)
             name_ind <- match("name",study_variables)
@@ -88,8 +89,8 @@ shinyServer(function(input, output) {
         names(pop_ind) <- populations
         pop_ind <- pop_ind[-1]
         #exclude bool gate
-        bool_ind <- unlist(lapply(pop_ind,function(cur_ind){flowWorkspace:::.isBoolGate(gh,cur_ind)}))
-        pop_ind[!bool_ind]
+#         bool_ind <- unlist(lapply(pop_ind,function(cur_ind){flowWorkspace:::.isBoolGate(gh,cur_ind)}))
+#         pop_ind[!bool_ind]
       })
       output$popCntrol <- renderUI({
 #         browser()
