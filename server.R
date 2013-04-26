@@ -110,9 +110,10 @@ shinyServer(function(input, output) {
       })
       
      output$groupCntrol <- renderUI({
+       this_choices <- colnames(pd_preloaded())
        selectInput("group", "Group by:", 
-                    choices = colnames(pd_preloaded())
-#                     ,selected = "VISITNO"
+                    choices = this_choices
+                    ,selected = this_choices[1]
                     ,multiple = TRUE
        )
      })
