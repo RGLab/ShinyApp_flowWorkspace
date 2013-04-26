@@ -1,23 +1,28 @@
 # library(googleVis)
 # library(flowWorkspace)
 library(flowIncubator)
-path <- ("/home/wjiang2/rglab/workspace/ShinyApp_flowWorkspace_devel")
+
 #pre-load gatingset,pdata and stats
 
 #test set
-# gs_HVTN <- load_gs(path=file.path(path,"HVTN/gs30141ebe77c4"))
-# pd_HVTN <-pData(gs_HVTN)
-# stats_HVTN <- getPopStats(gs_HVTN)
+ gs <- list()
+pd <- list()
+stats <- list()
 
-gs_HVTN <- load_gslist(path=file.path(path,"HVTN"))
-pd_HVTN <-pData(gs_HVTN)
-stats_HVTN <- getPopStats(gs_HVTN)
+for(this_study in studies){
+  
+  this_path <- file.path(studies_path,this_study)
+  nDir <- length(list.dirs(file.path(studies_path,this_study),recursive = F))
+  if(nDir>0){
+    gs[[this_study]] <- load_gslist(path=this_path)    
+  }else{
+    gs[[this_study]] <- load_gs(path=this_path)
+  }
 
+ pd[[this_study]]  <-pData(gs[[this_study]] )[,-c(6:7)]
+ stats[[this_study]]  <- getPopStats(gs[[this_study]])
 
-gs_RV144 <- load_gs(path=file.path(path,"RV144"))
-pd_RV144 <- pData(gs_RV144)
-stats_RV144 <- getPopStats(gs_RV144)
-
+}
 
 
 shinyServer(function(input, output) {
@@ -33,33 +38,17 @@ shinyServer(function(input, output) {
       
       gs_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN"){
-          gs_HVTN
-        }else if(this_study == "RV144"){
-          gs_RV144
-        }else{
-          stop("not valid study!")
-        }
-      })
+      gs[[this_study]]
+	 })
       pd_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN"){
-          pd_HVTN
-        }else if(this_study == "RV144"){
-          pd_RV144
-        }else{
-          stop("not valid study!")
-        }
+       pd[[this_study]]
+
       })
       stats_preloaded <- reactive({
         this_study <- study_selected()
-        if(this_study == "HVTN"){
-          stats_HVTN
-        }else if(this_study == "RV144"){
-          stats_RV144
-        }else{
-          stop("not valid study!")
-        }
+       stats[[this_study]]
+
       })
       
       output$gh_plot <- renderPlot({
@@ -69,14 +58,14 @@ shinyServer(function(input, output) {
             this_pd <- pd_preloaded()
             study_variables <- colnames(this_pd)
             name_ind <- match("name",study_variables)
-            study_variables <- study_variables[-name_ind]
+           study_variables <- study_variables[-name_ind]
             lapply(study_variables,function(this_variable){
               this_choices <- unique(as.character(this_pd[,this_variable]))
-              if(this_variable == "PTID"){
+             if(this_variable == "PTID"){
                 this_selected <- this_choices[1]  
-              }else{
-                this_selected <- this_choices[1:length(this_choices)]
-              }
+             }else{
+               this_selected <- this_choices[1:length(this_choices)]
+             }
               
               
               selectInput(this_variable, this_variable, 
@@ -119,13 +108,13 @@ shinyServer(function(input, output) {
                     )
       })
       
-      output$groupCntrol <- renderUI({
-        selectInput("group", "Group by:", 
-                     choices = colnames(pd_preloaded())
-                     ,selected = "VISITNO"
-                     ,multiple = TRUE
-        )
-      })
+     output$groupCntrol <- renderUI({
+       selectInput("group", "Group by:", 
+                    choices = colnames(pd_preloaded())
+#                     ,selected = "VISITNO"
+                    ,multiple = TRUE
+       )
+     })
       
       output$rootCntrol <- renderUI({
         gh <- gs_preloaded()[[1]]
@@ -146,25 +135,37 @@ shinyServer(function(input, output) {
                     ,multiple = FALSE)
       })
       
-      output$condCntrol <- renderUI({
+     output$condCntrol <- renderUI({
 #         browser()
-          group_v <-  input$group
-          cond_type <- ifelse(input$oneLevel,":","+")
-          group_v <- paste(group_v,collapse=cond_type)
-          textInput("cond", "group selected:", value = group_v)  
-        })
+         group_v <-  input$group
+         cond_type <- ifelse(input$oneLevel,":","+")
+         group_v <- paste(group_v,collapse=cond_type)
+         textInput("cond", "group selected:", value = group_v)  
+       })
       
       selected_samples <- reactive({
-        this_samples <- as.character(subset(pd_preloaded()
-               , PTID%in%input$PTID&Stim%in%input$Stim&VISITNO%in%input$VISITNO)$name
-          )
+#         browser()
+        this_pd <- pd_preloaded()
+        study_variables <- colnames(this_pd)
+        name_ind <- match("name",study_variables)
+        study_variables <- study_variables[-name_ind]
+        this_samples <- this_pd
+        for(this_variable in study_variables){
+          uu <- eval(substitute(as.symbol(u),list(u=this_variable)))
+          this_filter <- substitute(subset(this_samples, u%in%input[[v]]),list(u=uu,v=this_variable))
+          this_samples <- eval(this_filter)
+        }
+        
+          
+ 	    this_samples <- as.character(this_samples[,"name"])
+      #	this_samples <- as.character(pd_preloaded()$name)
           if(length(this_samples) == 0)this_samples = 1
             this_samples
       })
       
       cur_pd <- reactive({
 #         browser()
-        pd_preloaded()[selected_samples(),]
+        pd_preloaded()[selected_samples(),,drop=FALSE]
       })
       # Reactive expression
        gs_input <- reactive({
@@ -196,51 +197,51 @@ shinyServer(function(input, output) {
         #reset rows when unchecked
         numericInput("w_height","height:",value=400,min=0)    
       })
-      
       #calculate the appropriate nrow* ncol for lattice
       #always set page as 1 since shiny does not know
       #how to render multi-page pdf yet
       auto_layout <- function(studyVarsArray){
         
-          subpd <- cur_pd()
-#           newpd <- as.data.frame(
-#             lapply(
-#               subpd,
-#               function(x) {
-#                 if( ! all( is.na(x) ) ) {
-#                   gdata:::drop.levels(x);
-#                 } else {
-#                   x;
-#                 }
-#               }
-#             )
-#           );
-#           rownames( newpd ) <- rownames( subpd );
-#           colnames( newpd ) <- colnames( subpd );
-#           subG <- gs_input()
-#           pData( subG ) <- newpd;
-#           
-#           newpd <- newpd[ , gsub( "`", "", (studyVarsArray) ) ];
-#           npanels <- prod( do.call( c, lapply( newpd, nlevels) ) );
-#           # set the number of columns to the number of levels in the first study variable
-#           dim <- do.call( c, lapply( newpd, nlevels) )[[1]];
-#           browser()
-          dim <- nlevels(factor(subpd[,studyVarsArray[1]]))
-          c( dim, NA, 1 );
+        subpd <- cur_pd()
+        #           newpd <- as.data.frame(
+        #             lapply(
+        #               subpd,
+        #               function(x) {
+        #                 if( ! all( is.na(x) ) ) {
+        #                   gdata:::drop.levels(x);
+        #                 } else {
+        #                   x;
+        #                 }
+        #               }
+        #             )
+        #           );
+        #           rownames( newpd ) <- rownames( subpd );
+        #           colnames( newpd ) <- colnames( subpd );
+        #           subG <- gs_input()
+        #           pData( subG ) <- newpd;
+        #           
+        #           newpd <- newpd[ , gsub( "`", "", (studyVarsArray) ) ];
+        #           npanels <- prod( do.call( c, lapply( newpd, nlevels) ) );
+        #           # set the number of columns to the number of levels in the first study variable
+        #           dim <- do.call( c, lapply( newpd, nlevels) )[[1]];
+        #           browser()
+        dim <- nlevels(factor(subpd[,studyVarsArray[1]]))
+        c( dim, NA, 1 );
         
       }
       layout <- reactive({
         
         if(input$rows==0||length(input$rows)==0||!input$custlayout){
-#           browser()
+          #           browser()
           cond <- input$cond
           cond_variables <- strsplit(split = "\\+", cond)[[1]]
           auto_layout(cond_variables)
         }else{
-#           c(this_columns(),input$rows,1)  
+          #           c(this_columns(),input$rows,1)  
           c(NA,input$rows,1)  
         }
       })
+      
       w_height <- reactive({
         this_height <- input$w_height
         if(this_height==0||length(this_height)==0||!input$custWinSize){
@@ -261,64 +262,57 @@ shinyServer(function(input, output) {
         isolate({w_height()})
       }
       # pdata output
-      output$summary <- renderTable({
+     output$summary <- renderTable({
         
-#         if (input$actSummary == 0)
-#           return()
-# 
-#         isolate({
-          to_display <- cur_pd()
+        to_display <- cur_pd()[,-1]
           
-          to_display
-          #              gvisTable(to_display,list(page="disable"),chartid="name")  
-#         })      
-      })
+         to_display
+     })
     output$stats_plot <- renderPlot({
-      if (input$actPlotStats == 0)
-        return()
+     if (input$actPlotStats == 0)
+       return()
 #       browser()
-      isolate({
-        df <- cbind(cur_pd()[rownames(pop_stats_selected()),],pop_stats_selected())
+     isolate({
+       df <- cbind(cur_pd()[rownames(pop_stats_selected()),],pop_stats_selected())
         y_axis <- getNodes(gs_input()[[1]],isPath=TRUE)[as.integer(input$pops)]
         x_axis <- input$x_axis
         f1 <- paste("`",y_axis,"`~`",x_axis,"`",sep="")
         
-        cond <- input$cond
+       cond <- input$cond
 #         browser()
         if(length(cond)>0&&cond!="name"&&nchar(cond)>0){
-          f1 <- paste(f1,cond,sep="|")
+         f1 <- paste(f1,cond,sep="|")
         }
         
-        f1 <- gsub("\\\\","\\\\\\\\",f1)
-        f1 <- as.formula(f1)
+       f1 <- gsub("\\\\","\\\\\\\\",f1)
+       f1 <- as.formula(f1)
 #               browser()
         if(input$boxplot){
-          print(bwplot(f1
-                     ,data=df
-                     ,scales=list(x=list(rot=45))
-                     ,ylab="pop %"
-                     ,layout=layout()
-                     ,panel=function(...){
-                       panel.bwplot(...)
-                       panel.xyplot(...,jitter.x=TRUE)
-                      }
-                   )
+         print(bwplot(f1
+                    ,data=df
+                    ,scales=list(x=list(rot=45))
+                    ,ylab="pop %"
+                    ,layout=layout()
+                    ,panel=function(...){
+                      panel.bwplot(...)
+                      panel.xyplot(...,jitter.x=TRUE)
+                     }
+                  )
                 )
           
-        }else{
-          print(xyplot(as.formula(f1)
-                 ,data=df
-                 ,scales=list(x=list(rot=45))
-                 ,ylab="pop %"
-                 ,jitter.x=TRUE
-                  ,layout=layout()))
-          
-        }
-      }) 
+       }else{
+         print(xyplot(as.formula(f1)
+                ,data=df
+                ,scales=list(x=list(rot=45))
+                ,ylab="pop %"
+                ,jitter.x=TRUE
+                 ,layout=layout()))
+         
+       }
+     }) 
     }
-      ,height = get_w_height_stats
-#       ,width = get_w_width() 
-    )
+     ,height = get_w_height_stats
+   )
  
     
   
@@ -332,7 +326,7 @@ shinyServer(function(input, output) {
    isolate({
       xbin <- 64
       cur_data <-cur_pd()
-      group_v <-  input$group
+     group_v <-  input$group
       pop_ind <- as.integer(input$pops)
       
       #     if(pops == "all")pops = NULL
@@ -340,28 +334,28 @@ shinyServer(function(input, output) {
       stats <- input$stats
 #       digits <- input$digits
       digits <- 2
-      cond <- input$cond
+     cond <- input$cond
      
       
       
 #                                       browser()
-      #check if there are multiple flowFrames per panel
-      #cat FCS file name to cond if so
-      cur_factors <- lapply(group_v,function(cur_group_v){factor(cur_data[,cur_group_v])})
-      if(length(cur_factors) > 0){
-        multi_frames <- unlist(by(cur_data,cur_factors,function(cur_df){
-          nrow(cur_df) != 1
-        }))
-        if(any(multi_frames)){
-          cond <- gsub("\\+",":",cond)
-          cond <- paste(cond,"name",sep=":")
-        }  
+#       check if there are multiple flowFrames per panel
+#       cat FCS file name to cond if so
+     cur_factors <- lapply(group_v,function(cur_group_v){factor(cur_data[,cur_group_v])})
+     if(length(cur_factors) > 0){
+       multi_frames <- unlist(by(cur_data,cur_factors,function(cur_df){
+         nrow(cur_df) != 1
+       }))
+       if(any(multi_frames)){
+         cond <- gsub("\\+",":",cond)
+         cond <- paste(cond,"name",sep=":")
+       }  
       }
       
 #       browser()
       if(length(cond)==0||cond=="name"||nchar(cond)==0){
         cond <- NULL
-      }
+     }
 #       browser()
       overlay <-  input$overlay_pops
       if(length(overlay) == 0||!input$isOverlay){

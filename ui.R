@@ -10,20 +10,20 @@ shinyUI(pageWithSidebar(
   ,sidebarPanel(
     
 #     h4("Filters:")
-    
-    selectInput("study", "Studies:", 
-                 choices = c("HVTN","RV144")
-                 ,selected = "HVTN"
+
+selectInput("study", "Studies:", 
+                 choices = studies
+                 ,selected = studies[1]
               )
       ,uiOutput("FilterControls")
     ,uiOutput("popCntrol")  
     
     
-    ,uiOutput("groupCntrol")  
+   ,uiOutput("groupCntrol")  
     
-    ,checkboxInput("oneLevel", "Convert to one level:"
-                   ,value = FALSE)
-    , uiOutput("condCntrol")
+   ,checkboxInput("oneLevel", "Convert to one level:"
+                  ,value = FALSE)
+   , uiOutput("condCntrol")
      , checkboxInput("custlayout", "Custom grid layout", value = FALSE)
     ,conditionalPanel(condition = "input.custlayout == true"
                       ,uiOutput("rowsControl")
@@ -43,22 +43,21 @@ shinyUI(pageWithSidebar(
   # of the generated distribution
   mainPanel(
     tabsetPanel(
-      tabPanel("Summary"
-#                ,actionButton("actSummary","update")  
-               , htmlOutput("summary")
-               )
-      ,tabPanel("Gate Hierarchy"
+     tabPanel("Summary"
+                , htmlOutput("summary")
+              )
+     , tabPanel("Gate Hierarchy"
                 ,uiOutput("rootCntrol")
                 , plotOutput("gh_plot")
       )
-      ,tabPanel("Stats"
-                ,checkboxInput("boxplot","boxplot",value=TRUE)
-                ,uiOutput("axisCntrol")
-                ,actionButton("actPlotStats","plot")  
-               , plotOutput("stats_plot"
-                            ,height = "auto"
-                            )
-               )
+     ,tabPanel("Stats"
+               ,checkboxInput("boxplot","boxplot",value=TRUE)
+               ,uiOutput("axisCntrol")
+               ,actionButton("actPlotStats","plot")  
+              , plotOutput("stats_plot"
+                           ,height = "auto"
+                           )
+              )
       ,tabPanel("Gates"
                , checkboxInput("stats", "show proportions", value = TRUE)
                 , checkboxInput("isOverlay", "Overlay", value = FALSE)
