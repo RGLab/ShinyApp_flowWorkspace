@@ -340,14 +340,18 @@ shinyServer(function(input, output) {
      
       
       
-#                                       browser()
+#                                      
 #       check if there are multiple flowFrames per panel
 #       cat FCS file name to cond if so
      cur_factors <- lapply(group_v,function(cur_group_v){factor(cur_data[,cur_group_v])})
      if(length(cur_factors) > 0){
+#		 browser()
        multi_frames <- unlist(by(cur_data,cur_factors,function(cur_df){
-         nrow(cur_df) != 1
-       }))
+									nrow(cur_df) != 1
+       								}))
+		
+		multi_frames <- as.vector(multi_frames)
+		multi_frames[is.na(multi_frames)] <- FALSE
        if(any(multi_frames)){
          cond <- gsub("\\+",":",cond)
          cond <- paste(cond,"name",sep=":")
